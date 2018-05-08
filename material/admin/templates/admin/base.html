@@ -1,0 +1,169 @@
+{% load admin_static material_admin i18n %}<!DOCTYPE html>
+{% get_current_language as LANGUAGE_CODE %}
+<html lang="{{ LANGUAGE_CODE|default:"es-ar" }}">
+    <head>
+        <!--<title>{% block title %}{% endblock %}</title>-->
+        <title>Sistema de Gestión de Inventario</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+        {% block favicon %}<link href="{% static 'material/imgs/favicon.png' %}" rel="shortcut icon">{% endblock %}
+
+        {% include 'admin/includes/material_css.html' %}
+        <!--TODO: Change colors!
+        <link href="{% static 'css/materialize-blue.css' %}" rel="stylesheet">
+-->
+        {% block extrastyle %}{% endblock %}
+
+        <script src="{% static 'material/js/jquery-2.2.0.js' %}"></script>
+        <script>
+            // Use same django for material and django admin
+            var django = django || {};
+            django.jQuery = jQuery.noConflict(true);
+            window.jQuery = window.$ = django.jQuery
+        </script>
+        <script type="text/javascript">window.__admin_media_prefix__ = "{% filter escapejs %}{% static "admin/" %}{% endfilter %}";</script>
+        <script type="text/javascript">window.__admin_utc_offset__ = "{% filter escapejs %}{% now "Z" %}{% endfilter %}";</script>
+        {% if user.is_authenticated %}<script type="text/javascript" src="{% url 'admin:jsi18n' %}"></script>{% endif %}
+        {{ media.js }}
+        {% block extrahead %}{% endblock %}
+        {% block blockbots %}<meta name="robots" content="NONE,NOARCHIVE" />{% endblock %}
+    </head>
+
+    <body>
+
+        {% if not is_popup %}
+        <header>
+            <nav id="header" class="nav-top">
+                <div class="nav-wrapper">
+                    <a href="/" class="page-title hide-on-med-and-down">{% trans 'Administración de Inventarios ITS VILLADA' %} -- {% block brand-logo %}{% endblock %}</a>
+                    <a href="#" data-activates="nav-mobile" class="button-collapse full"><i class="material-icons">menu</i></a>
+
+                    <ul class="right">
+                        {% if user.is_authenticated %}
+
+                        <li>
+                            <a href="{% url 'my_profile_change' %}" title="{% trans 'My Profile' %}"><i class="material-icons">perm_identity</i></a>
+                        </li>
+                        <li>
+                            <a href="{% url 'admin:password_change' %}" title="Change Password"><i class="material-icons ">vpn_key</i></a>
+                        </li>
+
+                        <li>
+                            <a href="{% url 'admin:logout' %}" title="{% trans 'Log out' %}"><i class="material-icons ">power_settings_new</i></a>
+                        </li>
+                        <li>
+
+                            <div class="chip">
+                                {% if user.profile.photo %}
+                                <img src="{{ user.profile.photo.url }}" alt="{{ user.get_full_name }}">
+                                {% else %}
+                                <img src="http://icons.iconarchive.com/icons/custom-icon-design/pretty-office-2/48/man-icon.png" alt="">
+                                {% endif %}
+                                    {{ user.get_full_name }}
+                            </div>
+
+
+
+
+                        </li>
+                        {% block user_menu_extra %}{% endblock %}
+
+                        {% endif %}
+                    </ul>
+                </div>
+
+                <ul id="nav-mobile" class="side-nav fixed module-menu">
+                    <li class="logo valign-wrapper z-depth-1 hoverable waves-effect waves-light" style="width:100%;height:240px">
+                        <a href="{% url 'admin:index' %}" class="no-navigation">
+                            <img style="width: 100%;padding: 3rem 0rem 0rem 0rem;" src="{% static 'images/logo.png' %}"/>
+                            {% if user.is_authenticated %}
+<!--                            <img style="width: 100%;padding: 3rem 0rem 0rem 0rem;" src="{{request.user.get_url_icon}}"/>-->
+                            {% else %}
+<!--                            <img style="width: 100%;padding: 3rem 0rem 0rem 0rem;" src="{% static 'img/logo.png' %}"/>-->
+                            {% endif %}
+                        </a>
+                    </li>
+
+                    {% block breadcrumbs_left %}
+
+                    {% block back_link %}<li class="no-padding"><a class="collapsible-header no-pjax" href="{% url 'admin:index' %}"><i class="material-icons">dashboard</i>{% trans 'Back to Dashboard' %}</a></li>{% endblock %}
+
+
+
+                    <li class="no-padding active">
+                        <div class="collapsible-body" style="display:block">
+                            <ul class="collapsible" data-collapsible="accordion">
+                                {% get_app_list request as app_list %}
+                                {% for app in app_list %}
+                                <li class="header{% if app.active %} active{% endif %}">
+                                    <a class="collapsible-header{% if app.active %} active{% endif %}">{{ app.app_icon }} {{ app.name|truncatechars:23 }}</a>
+                                    <div class="collapsible-body" {% if app.active %}style="display:block"{% endif %}>
+                                        <ul>
+                                            {% for model in app.models %}
+                                            <li class="{% if model.active %}active{% endif %}">
+                                                <a href="{{ model.admin_url }}"> {{ model.name }}</a>
+                                            </li>
+                                            {% endfor %}
+                                        </ul>
+                                    </div>
+                                </li>
+                                {% endfor %}
+
+
+                                {% comment %}
+                                TODO: This is a site of menu
+                                {% endcomment %}
+
+
+
+                            </ul>
+                        </div>
+                    </li>
+
+
+
+                    {% endblock %}
+                </ul>
+            </nav>
+        </header>
+        {% endif %}
+
+        <main>
+            {% if not is_popup %}
+            {% block breadcrumbs %}
+            <div class="breadcrumbs">
+                <div>
+                    {% block breadcrumbs_items %}
+                    {% endblock %}
+                </div>
+            </div>
+            {% endblock %}
+            {% endif %}
+            {% block content %}
+            {{ content }}
+            {% endblock %}
+        </main>
+
+        {% include 'admin/includes/material_js.html' %}
+        {% block extrajs %}
+        <script>
+            $('select').material_select();
+        </script>
+        {% endblock %}
+
+        {% block messages %}
+        {% if messages %}
+        <script type="text/javascript">
+            $(document).ready(function() {
+                {% for message in messages %}
+                Materialize.toast('{{ message|capfirst }}', 10000, 'alert-{{ message.tags }}')
+                {% endfor %}
+                });
+        </script>
+        {% endif %}
+        {% endblock messages %}
+        <script>
+            $('select').material_select();
+            $('.modal-trigger').leanModal();
+        </script>
+    </body>
+</html>

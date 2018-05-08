@@ -1,0 +1,31 @@
+<a class="modal-trigger" href="#modal-{{user.id}}">{{user.get_full_name}}</a>
+<div id="modal-{{user.id}}" class="modal">
+    <div class="modal-content">
+        <h4>{{user.get_full_name}}</h4>
+        <div class="row">
+            <div class="input-field col s12 m3">
+                {% if user.profile.photo %}
+                <img class="center-align" src="{{ user.profile.photo.url }}" alt="{{ user.get_full_name }}" width="64px">
+                {% else %}
+                <img class="center-align" src="http://icons.iconarchive.com/icons/custom-icon-design/pretty-office-2/48/man-icon.png" width="64px" alt="">
+                {% endif %}
+            </div>
+            <div class="col s12 m9">
+                <div class="row">
+                    <h5 style="border-bottom: 2px solid #555;">User contact information</h5>
+
+
+                    <ul class="collection with-header">
+                        {% for card in user.profile.vcards.all %}
+                        <li class="collection-item"><div>{{card.vcard_html}}<a href="#!" class="secondary-content">{{card.vcard_icon}}</a></div></li>
+                        {% endfor %}
+                    </ul>
+
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <a href="#!" class="modal-action modal-close waves-effect waves-green btn white-text">Close</a>
+            </div>
+        </div>
+    </div>

@@ -1,0 +1,28 @@
+<div class="row">
+    {% if '<div' in fieldset_field.contents %}
+
+        <div class="checkbox-field col s12">
+        <label for="test7">{{ fieldset_field.field.label|title }}</label>
+        <div class="center-align">
+        {{fieldset_field.contents}}
+        </div>
+        </div>
+        {% else %}
+        {% if '<img' in fieldset_field.contents %}
+    <div class="checkbox-field col s12">
+        <label for="test7">{{ fieldset_field.field.label|title }}</label>
+        <div class="center-align">
+            {{fieldset_field.contents}}
+        </div>
+    </div>
+    {% else %}
+    <div class="input-field col s12">
+        <input disabled="" value="{{ fieldset_field.contents }}" id="disabled" type="text" class="validate">
+        <label for="disabled" class="active">{{ fieldset_field.field.label|title }}</label>
+        {% if fieldset_field.field.help_text %}
+        <small class="help-block">{{ fieldset_field.field.help_text }}</small>
+        {% endif %}
+    </div>
+    {% endif %}
+    {% endif %}
+</div>
